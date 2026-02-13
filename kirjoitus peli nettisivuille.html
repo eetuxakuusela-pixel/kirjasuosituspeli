@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kirjasuosituspeli – Suomen klassikot</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa, #e4e8ef);
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 620px;
+      text-align: center;
+    }
+
+    h1 { margin-top: 0; font-size: 28px; }
+
+    button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      background: #f0f2f5;
+      transition: transform 0.1s ease;
+    }
+
+    button:hover { transform: scale(1.03); }
+
+    .progress { margin-top: 15px; font-size: 14px; color: #666; }
+
+    .result { font-size: 22px; font-weight: bold; margin: 20px 0; }
+
+    .desc { font-size: 14px; color: #555; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📚 Suomen kirjasuosituspeli</h1>
+    <div id="content"></div>
+  </div>
+
+  <script>
+
+    // =============================
+    // 11 KYSYMYSTÄ (5 LISÄTTY)
+    // =============================
+
+    const questions = [
+      {
+        question: "Millaisesta tunnelmasta pidät eniten?",
+        options: [
+          { text: "Hauska ja lämmin", tag: "humor" },
+          { text: "Vakava ja syvällinen", tag: "classic" },
+          { text: "Sota ja historia", tag: "war" },
+          { text: "Nopea jännitys", tag: "thriller" }
+        ]
+      },
+      {
+        question: "Missä ympäristössä tarina kiinnostaa eniten?",
+        options: [
+          { text: "Maaseutu", tag: "nature" },
+          { text: "Kaupunki", tag: "classic" },
+          { text: "Sota-ajat", tag: "war" },
+          { text: "Työväen arki", tag: "society" }
+        ]
+      },
+      {
+        question: "Kuinka pitkän kirjan jaksat lukea?",
+        options: [
+          { text: "Lyhyt", tag: "short" },
+          { text: "Keskipitkä", tag: "classic" },
+          { text: "Pitkä romaani", tag: "epic" },
+          { text: "Ei väliä", tag: "war" }
+        ]
+      },
+      {
+        question: "Haluatko koulusta tuttuja klassikoita?",
+        options: [
+          { text: "Kyllä", tag: "classic" },
+          { text: "Ehkä", tag: "nature" },
+          { text: "En", tag: "thriller" },
+          { text: "Modernimpaa", tag: "society" }
+        ]
+      },
+      {
+        question: "Pidätkö huumorista kirjassa?",
+        options: [
+          { text: "Paljon", tag: "humor" },
+          { text: "Hieman", tag: "classic" },
+          { text: "En juurikaan", tag: "war" },
+          { text: "Ei väliä", tag: "nature" }
+        ]
+      },
+
+      // ---- Uudet 5 kysymystä ----
+
+      {
+        question: "Haluatko kirjan käsittelevän suomalaisuutta ja identiteettiä?",
+        options: [
+          { text: "Kyllä", tag: "society" },
+          { text: "Jonkin verran", tag: "classic" },
+          { text: "En erityisesti", tag: "thriller" },
+          { text: "Luonto tärkeämpi", tag: "nature" }
+        ]
+      },
+      {
+        question: "Kiinnostaako historiallinen aikakausi (sisällissota, sota, vanha Suomi)?",
+        options: [
+          { text: "Todella paljon", tag: "war" },
+          { text: "Hieman", tag: "classic" },
+          { text: "En", tag: "humor" },
+          { text: "Moderni aika mieluummin", tag: "thriller" }
+        ]
+      },
+      {
+        question: "Haluatko vahvoja henkilöhahmoja ja perhesaagoja?",
+        options: [
+          { text: "Kyllä", tag: "epic" },
+          { text: "Jonkin verran", tag: "classic" },
+          { text: "En", tag: "thriller" },
+          { text: "Lyhyt tarina riittää", tag: "short" }
+        ]
+      },
+      {
+        question: "Luetko mieluummin murretta ja vanhaa kieltä vai helppoa tekstiä?",
+        options: [
+          { text: "Vanhaa kieltä", tag: "classic" },
+          { text: "Sekä että", tag: "nature" },
+          { text: "Helppoa", tag: "thriller" },
+          { text: "Lyhyttä ja selkeää", tag: "short" }
+        ]
+      },
+      {
+        question: "Haluatko tunnetuimman mahdollisen suomalaisen klassikon?",
+        options: [
+          { text: "Kyllä", tag: "iconic" },
+          { text: "Ehkä", tag: "classic" },
+          { text: "Haluan harvinaisemman", tag: "nature" },
+          { text: "Jännäri mieluummin", tag: "thriller" }
+        ]
+      }
+    ];
+
+
+    // =============================
+    // SUOMEN KANSALLISIA KLASSIKOITA
+    // =============================
+
+    const books = {
+      iconic: {
+        title: "Seitsemän veljestä – Aleksis Kivi",
+        desc: "Suomen kirjallisuuden peruskivi ja tunnetuin klassikko."
+      },
+      war: {
+        title: "Tuntematon sotilas – Väinö Linna",
+        desc: "Suomalaisten sotilaiden tarina jatkosodassa."
+      },
+      epic: {
+        title: "Täällä Pohjantähden alla – Väinö Linna",
+        desc: "Kolmen sukupolven eeppinen kuvaus Suomen historiasta."
+      },
+      society: {
+        title: "Työmiehen vaimo – Minna Canth",
+        desc: "Yhteiskunnallinen klassikko naisten asemasta ja oikeuksista."
+      },
+      nature: {
+        title: "Putkinotko – Joel Lehtonen",
+        desc: "Huumoria ja elämänmakuisia hetkiä suomalaisesta maaseudusta."
+      },
+      humor: {
+        title: "Juha – Juhani Aho",
+        desc: "Lyhyt mutta voimakas tarina rakkaudesta ja maaseudusta."
+      },
+      classic: {
+        title: "Sinuhe egyptiläinen – Mika Waltari",
+        desc: "Historiallinen seikkailu ja yksi Suomen luetuimmista romaaneista."
+      },
+      short: {
+        title: "Hellaakoski – runovalikoima",
+        desc: "Lyhyitä ja helposti lähestyttäviä runoja klassikkokirjailijalta."
+      },
+      thriller: {
+        title: "Ilkka Remes – Pääkallokehrääjä",
+        desc: "Nopeatempoinen suomalainen jännitysromaani."
+      }
+    };
+
+
+    // =============================
+    // LOGIIKKA
+    // =============================
+
+    let step = 0;
+    let scores = {};
+    const content = document.getElementById("content");
+
+    function renderQuestion() {
+      const q = questions[step];
+      content.innerHTML = `<p>${q.question}</p>`;
+
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.text;
+        btn.onclick = () => answer(opt.tag);
+        content.appendChild(btn);
+      });
+
+      const progress = document.createElement("div");
+      progress.className = "progress";
+      progress.textContent = `Kysymys ${step + 1} / ${questions.length}`;
+      content.appendChild(progress);
+    }
+
+    function answer(tag) {
+      scores[tag] = (scores[tag] || 0) + 1;
+
+      if (step + 1 < questions.length) {
+        step++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      const best = Object.entries(scores).sort((a,b) => b[1] - a[1])[0][0];
+      const book = books[best];
+
+      content.innerHTML = `
+        <div class="result">${book.title}</div>
+        <div class="desc">${book.desc}</div>
+        <button onclick="restart()">Pelaa uudestaan</button>
+      `;
+    }
+
+    function restart() {
+      step = 0;
+      scores = {};
+      renderQuestion();
+    }
+
+    renderQuestion();
+
+  </script>
+</body>
+</html>
